@@ -1,0 +1,1 @@
+# open-api-schema-collector

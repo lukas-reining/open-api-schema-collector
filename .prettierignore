@@ -1,0 +1,7 @@
+# Add files here to ignore them from prettier formatting
+
+/dist
+/coverage
+/apps/api/src/migrations
+/doc
+/apps/api/src/assets

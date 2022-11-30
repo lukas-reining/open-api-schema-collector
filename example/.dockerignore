@@ -1,0 +1,6 @@
+.idea
+terraform
+node_modules
+.gitignore
+.prettierrc
+nest-cli.json
