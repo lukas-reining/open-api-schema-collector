@@ -10,9 +10,9 @@ output "main_https_lb_listener" {
   value = aws_lb_listener.https.arn
 }
 
-output "private_subnet_ids" {
+output "public_subnet_ids" {
   value = [
-    for subnet in aws_subnet.private : subnet.id
+    for subnet in aws_subnet.public : subnet.id
   ]
 }
 

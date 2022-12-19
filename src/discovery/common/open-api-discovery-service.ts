@@ -1,7 +1,7 @@
-import { OpenApiAdvertisement } from './open-api-advertisement';
+import { OpenApiSchema } from './open-api-schema';
 
 export abstract class OpenApiDiscoveryService {
-  public abstract discoverOpenApiSpecs():
-    | Promise<OpenApiAdvertisement[]>
-    | OpenApiAdvertisement[];
+  public abstract getOpenApiSchemas():
+    | Promise<OpenApiSchema[]>
+    | OpenApiSchema[];
 }

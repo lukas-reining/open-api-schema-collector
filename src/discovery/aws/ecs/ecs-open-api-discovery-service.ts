@@ -3,6 +3,9 @@ import { OpenApiDiscoveryService } from '../../common/open-api-discovery-service
 import { Injectable, Logger } from '@nestjs/common';
 import { isDefined } from '../../../common';
 import { OpenApiAdvertisement } from 'src/discovery/common/open-api-advertisement';
+import { OpenApiSchema } from '../../common/open-api-schema';
+import { firstValueFrom } from 'rxjs';
+import { HttpService } from '@nestjs/axios';
 
 interface EcsOpenApiDiscoveryServiceConfig {
   clusterArn?: string;
@@ -31,14 +34,17 @@ export class AwsEcsOpenApiDiscoveryService extends OpenApiDiscoveryService {
   private readonly openApiSchemaPortTag: string;
   private readonly openApiSchemaPathTag: string;
 
-  constructor({
-    clusterArn,
-    clusterArns = [],
-    openApiSchemaAvailableTag = 'OpenApiSchemaAvailable',
-    openApiSchemaProtocolTag = 'OpenApiSchemaProtocol',
-    openApiSchemaPortTag = 'OpenApiSchemaPort',
-    openApiSchemaPathTag = 'OpenApiSchemaPath',
-  }: EcsOpenApiDiscoveryServiceConfig) {
+  constructor(
+    private readonly httpService: HttpService,
+    {
+      clusterArn,
+      clusterArns = [],
+      openApiSchemaAvailableTag = 'OpenApiSchemaAvailable',
+      openApiSchemaProtocolTag = 'OpenApiSchemaProtocol',
+      openApiSchemaPortTag = 'OpenApiSchemaPort',
+      openApiSchemaPathTag = 'OpenApiSchemaPath',
+    }: EcsOpenApiDiscoveryServiceConfig,
+  ) {
     super();
     this.ecsClient = new ECS({ apiVersion: '2014-11-13' });
     this.clusterArns = [clusterArn, ...clusterArns].filter(isDefined);
@@ -189,5 +195,35 @@ export class AwsEcsOpenApiDiscoveryService extends OpenApiDiscoveryService {
     return tasks
       .map(this.getOpenApiAdvertisementForTask.bind(this))
       .filter(isDefined);
+  }
+
+  public async getOpenApiSchemas(): Promise<OpenApiSchema[]> {
+    const advertisements = await this.discoverOpenApiSpecs();
+
+    return Promise.all(
+      advertisements.map((advertisement) => {
+        return this.schemaFor(advertisement);
+      }),
+    );
+  }
+
+  private async schemaFor(advertisement: OpenApiAdvertisement) {
+    const url = `${advertisement.protocol}://${advertisement.host}:${advertisement.port}${advertisement.path}`;
+
+    try {
+      const { data: schema } = await firstValueFrom(
+        this.httpService.get(url, { timeout: 10000 }),
+      );
+      this.logger.verbose(
+        `Loaded OpenApi schema for source: ${advertisement.source}`,
+      );
+      return { source: advertisement.source, schema };
+    } catch (e) {
+      this.logger.error(
+        `Error loading OpenApi schema for source: ${advertisement.source}`,
+        e,
+      );
+      return { source: advertisement.source, schema: null };
+    }
   }
 }
