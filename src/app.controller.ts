@@ -12,19 +12,17 @@ export class AppController {
 
   @Get('/open-api/schemas')
   public async getOpenApiSchemas() {
-    return this.openApiDiscoveryService.getOpenApiSchemas();
+    return this.openApiDiscoveryService.getOpenApiSchemasWithProxy();
   }
 
   @Get('/open-api/schemas/:schemaSource')
   public async getOpenApiSchemaForSource(
     @Param('schemaSource') schemaSource: string,
   ) {
-    const schemas = await this.openApiDiscoveryService.getOpenApiSchemas();
+    const schemas =
+      await this.openApiDiscoveryService.getOpenApiSchemasWithProxy();
 
-    const schema = schemas.find(
-      ({ source }) =>
-        source === Buffer.from(schemaSource, 'base64').toString('ascii'),
-    );
+    const schema = schemas.find(({ id }) => id === schemaSource);
 
     if (!schema) {
       throw new NotFoundException('The requested schema does not exist');
@@ -35,11 +33,12 @@ export class AppController {
 
   @Get('/open-api/swagger/config')
   public async getSwaggerConfig() {
-    const schemas = await this.openApiDiscoveryService.getOpenApiSchemas();
+    const schemas =
+      await this.openApiDiscoveryService.getOpenApiSchemasWithProxy();
 
-    const urls = schemas.map(({ source }) => ({
-      name: source,
-      url: `/open-api/schemas/${Buffer.from(source).toString('base64')}`,
+    const urls = schemas.map(({ id, source, schema }) => ({
+      name: schema?.info?.title ?? 'No Title',
+      url: `/open-api/schemas/${id}`,
     }));
 
     return { urls };

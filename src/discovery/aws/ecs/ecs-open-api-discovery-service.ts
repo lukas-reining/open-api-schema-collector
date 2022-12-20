@@ -6,6 +6,7 @@ import { OpenApiAdvertisement } from 'src/discovery/common/open-api-advertisemen
 import { OpenApiSchema } from '../../common/open-api-schema';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
+import { md5 } from '../../encoding';
 
 interface EcsOpenApiDiscoveryServiceConfig {
   clusterArn?: string;
@@ -209,6 +210,7 @@ export class AwsEcsOpenApiDiscoveryService extends OpenApiDiscoveryService {
 
   private async schemaFor(advertisement: OpenApiAdvertisement) {
     const url = `${advertisement.protocol}://${advertisement.host}:${advertisement.port}${advertisement.path}`;
+    const id = md5(url);
 
     try {
       const { data: schema } = await firstValueFrom(
@@ -217,13 +219,13 @@ export class AwsEcsOpenApiDiscoveryService extends OpenApiDiscoveryService {
       this.logger.verbose(
         `Loaded OpenApi schema for source: ${advertisement.source}`,
       );
-      return { source: advertisement.source, schema };
+      return { id, source: advertisement.source, schema };
     } catch (e) {
       this.logger.error(
         `Error loading OpenApi schema for source: ${advertisement.source}`,
         e,
       );
-      return { source: advertisement.source, schema: null };
+      return { id, source: advertisement.source, schema: null };
     }
   }
 }

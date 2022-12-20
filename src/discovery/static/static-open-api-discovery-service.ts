@@ -3,6 +3,8 @@ import { OpenApiSchema } from '../common/open-api-schema';
 import * as Fs from 'fs';
 import * as Path from 'path';
 import { Logger } from '@nestjs/common';
+import * as crypto from 'crypto';
+import { md5 } from '../encoding';
 
 export class StaticOpenApiDiscoveryService extends OpenApiDiscoveryService {
   private readonly logger = new Logger(StaticOpenApiDiscoveryService.name);
@@ -32,6 +34,7 @@ export class StaticOpenApiDiscoveryService extends OpenApiDiscoveryService {
       .map((file) => Path.join(path, file))
       .map<[string, Buffer]>((file) => [file, Fs.readFileSync(file)])
       .map(([fileName, buffer]) => ({
+        id: md5(fileName),
         source: fileName,
         schema: JSON.parse(buffer.toString()),
       }));

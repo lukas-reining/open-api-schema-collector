@@ -42,7 +42,7 @@ module "open_api_collector" {
   base_domain = "aws.reiningapps.de"
   host        = "open-api-collector.aws.reiningapps.de"
 
-  container_image_tag = "7"
+  container_image_tag = "9"
   container_port      = 3000
 }
 
