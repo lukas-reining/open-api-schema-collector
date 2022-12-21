@@ -1,5 +1,8 @@
 import { OpenApiDiscoveryService } from '../common/open-api-discovery-service';
-import { OpenApiSchemaSource } from '../common/open-api-schema-source';
+import {
+  OpenApiSchemaSource,
+  toBaseUrl,
+} from '../common/open-api-schema-source';
 import * as Fs from 'fs';
 import * as Path from 'path';
 import { Logger } from '@nestjs/common';
@@ -32,15 +35,19 @@ export class StaticOpenApiDiscoveryService extends OpenApiDiscoveryService {
     return files
       .map((file) => Path.join(path, file))
       .map<[string, Buffer]>((file) => [file, Fs.readFileSync(file)])
-      .map(([fileName, buffer]) => ({
-        id: md5(fileName),
-        source: fileName,
-        address: {
-          internal: null,
-          external: null,
-        },
-        schema: JSON.parse(buffer.toString()),
-      }));
+      .map(([fileName, buffer]) => {
+        const schema = JSON.parse(buffer.toString());
+
+        return {
+          id: md5(fileName),
+          source: fileName,
+          address: {
+            internal: null,
+            external: toBaseUrl(schema),
+          },
+          schema: schema,
+        };
+      });
   }
 
   private loadSchemasForPaths(paths: string[]): OpenApiSchemaSource[] {

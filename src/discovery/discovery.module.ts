@@ -17,6 +17,7 @@ import {
   DiscoveryProvider,
   StaticDiscoveryProvider,
 } from './discovery-provider';
+import { ProxyModule } from '../proxy/proxy.module';
 
 export const DISCOVERY_SERVICES_TOKEN = 'OpenApiDiscoveryServices';
 export const DISCOVERY_CONFIG_OPTIONS = 'DISCOVERY_CONFIG_OPTIONS';
@@ -32,7 +33,7 @@ type NestProvider =
   | ExistingProvider;
 
 @Module({
-  imports: [HttpModule],
+  imports: [HttpModule, ProxyModule],
 })
 export class DiscoveryModule {
   private static awsEcsDiscoveryProvider(

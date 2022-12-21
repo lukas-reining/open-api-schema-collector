@@ -2,8 +2,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import { OpenApiDiscoveryService } from './common/open-api-discovery-service';
 import {
   isOasV2Source,
-  isOasV3Source,
   isOasV3_1Source,
+  isOasV3Source,
   OpenApiDoc,
   OpenApiSchemaSource,
 } from './common/open-api-schema-source';
@@ -12,12 +12,14 @@ import {
   toOpenApiSchemaWithProxyOAS2,
   toOpenApiSchemaWithProxyOAS3,
 } from './common/open-api-functions';
+import { ProxyService } from '../proxy/proxy.service';
 
 @Injectable()
 export class DiscoveryService extends OpenApiDiscoveryService {
   constructor(
     @Inject(DISCOVERY_SERVICES_TOKEN)
     private services: OpenApiDiscoveryService[],
+    private proxyService: ProxyService,
   ) {
     super();
   }
@@ -25,10 +27,14 @@ export class DiscoveryService extends OpenApiDiscoveryService {
   private toOpenApiSchemaWithProxy<T extends OpenApiDoc>(
     schema: OpenApiSchemaSource<T>,
   ) {
+    const generateProxyUrl = this.proxyService.toProxyUrl.bind(
+      this.proxyService,
+    );
+
     if (isOasV2Source(schema)) {
-      return toOpenApiSchemaWithProxyOAS2(schema);
+      return toOpenApiSchemaWithProxyOAS2(schema, generateProxyUrl);
     } else if (isOasV3Source(schema) || isOasV3_1Source(schema)) {
-      return toOpenApiSchemaWithProxyOAS3(schema);
+      return toOpenApiSchemaWithProxyOAS3(schema, generateProxyUrl);
     }
 
     return schema;

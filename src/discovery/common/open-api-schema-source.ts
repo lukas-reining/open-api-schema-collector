@@ -1,5 +1,5 @@
 import { OpenAPIV2, OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
-import url from 'url';
+import * as url from 'url';
 
 export type OpenApiDocV2 = OpenAPIV2.Document;
 export type OpenApiDocV3 = OpenAPIV3.Document;
@@ -63,7 +63,7 @@ export function toBaseUrl(doc: OpenApiDoc): string | null {
     }
   } else {
     const servers = doc.servers;
-    return (servers && servers[0])?.url ?? null;
+    return (servers && servers[0])?.url ?? null; // TODO Could use many servers
   }
 
   return null;

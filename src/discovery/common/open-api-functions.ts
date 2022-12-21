@@ -5,15 +5,14 @@ import {
   OpenApiSchemaSource,
 } from './open-api-schema-source';
 import * as url from 'url';
-import { toProxyUrl } from '../../proxy/proxy-functions';
 
 export function toBaseUrlV2({
   address,
 }: OpenApiSchemaSource<OpenApiDocV2>): URL | null {
-  if (address.external) {
-    return new URL(address.external);
-  } else if (address.internal) {
+  if (address.internal) {
     return new URL(address.internal);
+  } else if (address.external) {
+    return new URL(address.external);
   } else {
     return null;
   }
@@ -25,10 +24,10 @@ export function toBaseUrlsV3<T extends OpenApiDocV3 | OpenApiDocV3_1>({
 }: OpenApiSchemaSource<T>): URL[] | null {
   if (schema.servers?.length) {
     return schema.servers.map((server) => new url.URL(server.url));
-  } else if (address.external) {
-    return [new URL(address.external)];
   } else if (address.internal) {
     return [new URL(address.internal)];
+  } else if (address.external) {
+    return [new URL(address.external)];
   }
 
   return null;
@@ -36,6 +35,7 @@ export function toBaseUrlsV3<T extends OpenApiDocV3 | OpenApiDocV3_1>({
 
 export function toOpenApiSchemaWithProxyOAS2(
   schema: OpenApiSchemaSource<OpenApiDocV2>,
+  createProxyUrl: (url: string) => string,
 ): OpenApiSchemaSource<OpenApiDocV2> {
   const baseUrl = toBaseUrlV2(schema)?.href;
 
@@ -49,19 +49,20 @@ export function toOpenApiSchemaWithProxyOAS2(
       ...schema.schema,
       schemes: undefined, // TODO Check what to do
       host: undefined,
-      basePath: toProxyUrl(baseUrl),
+      basePath: createProxyUrl(baseUrl),
     },
   };
 }
 
 export function toOpenApiSchemaWithProxyOAS3(
   schema: OpenApiSchemaSource<OpenApiDocV3 | OpenApiDocV3_1>,
+  createProxyUrl: (url: string) => string,
 ): OpenApiSchemaSource<OpenApiDocV3 | OpenApiDocV3_1> {
   const baseUrls = toBaseUrlsV3(schema);
 
   const servers = schema.schema.servers;
   const proxyServers = baseUrls?.map(({ href }) => ({
-    url: toProxyUrl(href),
+    url: createProxyUrl(href),
   }));
 
   if (!proxyServers) {
