@@ -1,0 +1,63 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "DiscoveryProvider": {
+            "anyOf": [
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "paths": {
+                            "items": {
+                                "type": "string"
+                            },
+                            "title": "paths",
+                            "type": "array"
+                        },
+                        "type": {
+                            "enum": [
+                                "static"
+                            ],
+                            "title": "type",
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "paths",
+                        "type"
+                    ],
+                    "type": "object"
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "clusterArns": {
+                            "items": {
+                                "type": "string"
+                            },
+                            "title": "clusterArns",
+                            "type": "array"
+                        },
+                        "type": {
+                            "enum": [
+                                "aws_ecs"
+                            ],
+                            "title": "type",
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "clusterArns",
+                        "type"
+                    ],
+                    "type": "object"
+                }
+            ],
+            "title": "DiscoveryProvider"
+        }
+    },
+    "items": {
+        "$ref": "#/definitions/DiscoveryProvider"
+    },
+    "type": "array"
+}
+

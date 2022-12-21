@@ -1,4 +1,4 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { DynamicModule, Logger, Module } from '@nestjs/common';
 import { HttpModule, HttpService } from '@nestjs/axios';
 import { AwsEcsOpenApiDiscoveryService } from './aws/ecs/ecs-open-api-discovery-service';
 import { StaticOpenApiDiscoveryService } from './static/static-open-api-discovery-service';
@@ -17,13 +17,18 @@ import {
   DiscoveryProvider,
   StaticDiscoveryProvider,
 } from './discovery-provider';
+import Ajv from 'ajv';
 import { ProxyModule } from '../proxy/proxy.module';
+import * as Fs from 'fs';
+
+import * as ProviderJsonSchema from '../../providers.schema.json';
 
 export const DISCOVERY_SERVICES_TOKEN = 'OpenApiDiscoveryServices';
 export const DISCOVERY_CONFIG_OPTIONS = 'DISCOVERY_CONFIG_OPTIONS';
 
 export type DiscoveryOptions = {
-  providers: DiscoveryProvider[];
+  providers?: DiscoveryProvider[];
+  providersFile?: string;
 };
 
 type NestProvider =
@@ -36,6 +41,8 @@ type NestProvider =
   imports: [HttpModule, ProxyModule],
 })
 export class DiscoveryModule {
+  private static logger = new Logger(DiscoveryModule.name);
+
   private static awsEcsDiscoveryProvider(
     provider: AwsEcsDiscoveryProvider,
   ): NestProvider {
@@ -73,8 +80,40 @@ export class DiscoveryModule {
     return providers.map(DiscoveryModule.toProvider.bind(this));
   }
 
+  private static loadProviderFile(path: string): DiscoveryProvider[] {
+    let file;
+    try {
+      file = Fs.readFileSync(path);
+    } catch (e) {
+      throw new Error('Provider file does not exist');
+    }
+
+    const validator = new Ajv().compile<DiscoveryProvider[]>(
+      ProviderJsonSchema,
+    );
+    const providerConfig = JSON.parse(file.toString());
+
+    if (validator(providerConfig)) {
+      return providerConfig;
+    }
+
+    const errorMessages = validator.errors?.map(({ message }) => message);
+    this.logger.error(`Provider file is invalid: ${errorMessages?.join(', ')}`);
+    throw new Error('Provider file is invalid');
+  }
+
+  private static loadProviders(options: DiscoveryOptions): DiscoveryProvider[] {
+    if (options.providers) {
+      return options.providers;
+    } else if (options.providersFile) {
+      return this.loadProviderFile(options.providersFile);
+    }
+
+    throw new Error('Missing provider configuration');
+  }
+
   public static register(options: DiscoveryOptions): DynamicModule {
-    const providers = this.toProviders(options.providers);
+    const providers = this.toProviders(this.loadProviders(options));
     const providerTokens = providers.map(({ provide }) => provide);
 
     return {

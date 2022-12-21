@@ -3,19 +3,13 @@ import { AppController } from './app.controller';
 import { DiscoveryModule } from './discovery/discovery.module';
 import { ProxyModule } from './proxy/proxy.module';
 
+const providerJsonPath = process.env.OASD_PROVIDERS_JSON_PATH;
+
 @Module({
   imports: [
     ProxyModule,
     DiscoveryModule.register({
-      providers: [
-        { type: 'static', paths: ['openapi'] },
-        {
-          type: 'aws_ecs',
-          clusterArns: [
-            'arn:aws:ecs:eu-central-1:938786464309:cluster/ecs-test-cluster',
-          ],
-        },
-      ],
+      providersFile: providerJsonPath ?? './example_providers.json',
     }),
   ],
   controllers: [AppController],

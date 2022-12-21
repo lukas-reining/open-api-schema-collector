@@ -10,3 +10,5 @@ export type AwsEcsDiscoveryProvider = {
 export type DiscoveryProvider =
   | StaticDiscoveryProvider
   | AwsEcsDiscoveryProvider;
+
+export type DiscoveryProviders = DiscoveryProvider[];
