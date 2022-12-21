@@ -2,11 +2,15 @@ import { ECS, Tag, Task } from '@aws-sdk/client-ecs';
 import { OpenApiDiscoveryService } from '../../common/open-api-discovery-service';
 import { Injectable, Logger } from '@nestjs/common';
 import { isDefined } from '../../../common';
-import { OpenApiAdvertisement } from 'src/discovery/common/open-api-advertisement';
-import { OpenApiSchema } from '../../common/open-api-schema';
+
+import {
+  OpenApiSchemaSource,
+  toBaseUrl,
+} from '../../common/open-api-schema-source';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { md5 } from '../../encoding';
+import { EcsOpenApiAdvertisement } from './open-api-advertisement';
 
 interface EcsOpenApiDiscoveryServiceConfig {
   clusterArn?: string;
@@ -110,7 +114,7 @@ export class AwsEcsOpenApiDiscoveryService extends OpenApiDiscoveryService {
 
   private getOpenApiAdvertisementForTask(
     task: Task,
-  ): OpenApiAdvertisement | undefined {
+  ): EcsOpenApiAdvertisement | undefined {
     if (!this.openApiSchemaAvailable(task)) {
       this.logger.debug(
         `Skipping task ${task.taskArn} because it has not declared OpenApi spec availability`,
@@ -164,7 +168,7 @@ export class AwsEcsOpenApiDiscoveryService extends OpenApiDiscoveryService {
     };
   }
 
-  public async discoverOpenApiSpecs(): Promise<OpenApiAdvertisement[]> {
+  public async discoverOpenApiSpecs(): Promise<EcsOpenApiAdvertisement[]> {
     const clusters = await this.ecsClient.describeClusters({
       clusters: this.clusterArns,
     });
@@ -198,7 +202,7 @@ export class AwsEcsOpenApiDiscoveryService extends OpenApiDiscoveryService {
       .filter(isDefined);
   }
 
-  public async getOpenApiSchemas(): Promise<OpenApiSchema[]> {
+  public async getOpenApiSchemas(): Promise<OpenApiSchemaSource[]> {
     const advertisements = await this.discoverOpenApiSpecs();
 
     return Promise.all(
@@ -208,24 +212,35 @@ export class AwsEcsOpenApiDiscoveryService extends OpenApiDiscoveryService {
     );
   }
 
-  private async schemaFor(advertisement: OpenApiAdvertisement) {
-    const url = `${advertisement.protocol}://${advertisement.host}:${advertisement.port}${advertisement.path}`;
-    const id = md5(url);
+  private async schemaFor(advertisement: EcsOpenApiAdvertisement) {
+    const serviceUrl = `${advertisement.protocol}://${advertisement.host}:${advertisement.port}`;
+    const openApiUrl = `${serviceUrl}${advertisement.path}`;
+    const id = md5(openApiUrl);
 
     try {
       const { data: schema } = await firstValueFrom(
-        this.httpService.get(url, { timeout: 10000 }),
+        this.httpService.get(openApiUrl, { timeout: 10000 }),
       );
       this.logger.verbose(
         `Loaded OpenApi schema for source: ${advertisement.source}`,
       );
-      return { id, source: advertisement.source, schema };
+      return {
+        id,
+        source: advertisement.source,
+        schema,
+        address: { internal: serviceUrl, external: toBaseUrl(schema) },
+      };
     } catch (e) {
       this.logger.error(
         `Error loading OpenApi schema for source: ${advertisement.source}`,
         e,
       );
-      return { id, source: advertisement.source, schema: null };
+      return {
+        id,
+        source: advertisement.source,
+        schema: null,
+        address: { internal: serviceUrl, external: null },
+      };
     }
   }
 }

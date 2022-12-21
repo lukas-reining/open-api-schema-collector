@@ -9,12 +9,12 @@ import { ProxyModule } from './proxy/proxy.module';
     DiscoveryModule.register({
       providers: [
         { type: 'static', paths: ['openapi'] },
-        // {
-        //   type: 'aws_ecs',
-        //   clusterArns: [
-        //     'arn:aws:ecs:eu-central-1:938786464309:cluster/ecs-test-cluster',
-        //   ],
-        // },
+        {
+          type: 'aws_ecs',
+          clusterArns: [
+            'arn:aws:ecs:eu-central-1:938786464309:cluster/ecs-test-cluster',
+          ],
+        },
       ],
     }),
   ],

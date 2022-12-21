@@ -1,7 +1,7 @@
-import { OpenApiSchema } from './open-api-schema';
+import { OpenApiSchemaSource } from './open-api-schema-source';
 
 export abstract class OpenApiDiscoveryService {
   public abstract getOpenApiSchemas():
-    | Promise<OpenApiSchema[]>
-    | OpenApiSchema[];
+    | Promise<OpenApiSchemaSource[]>
+    | OpenApiSchemaSource[];
 }

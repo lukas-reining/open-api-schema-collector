@@ -1,9 +1,8 @@
 import { OpenApiDiscoveryService } from '../common/open-api-discovery-service';
-import { OpenApiSchema } from '../common/open-api-schema';
+import { OpenApiSchemaSource } from '../common/open-api-schema-source';
 import * as Fs from 'fs';
 import * as Path from 'path';
 import { Logger } from '@nestjs/common';
-import * as crypto from 'crypto';
 import { md5 } from '../encoding';
 
 export class StaticOpenApiDiscoveryService extends OpenApiDiscoveryService {
@@ -27,7 +26,7 @@ export class StaticOpenApiDiscoveryService extends OpenApiDiscoveryService {
     return !Fs.existsSync(path);
   }
 
-  private loadSchemasForPath(path: string): OpenApiSchema[] {
+  private loadSchemasForPath(path: string): OpenApiSchemaSource[] {
     const dirCont = Fs.readdirSync(path);
     const files = dirCont.filter((elm) => elm.match(/.*\.(json)/gi));
     return files
@@ -36,15 +35,19 @@ export class StaticOpenApiDiscoveryService extends OpenApiDiscoveryService {
       .map(([fileName, buffer]) => ({
         id: md5(fileName),
         source: fileName,
+        address: {
+          internal: null,
+          external: null,
+        },
         schema: JSON.parse(buffer.toString()),
       }));
   }
 
-  private loadSchemasForPaths(paths: string[]): OpenApiSchema[] {
+  private loadSchemasForPaths(paths: string[]): OpenApiSchemaSource[] {
     return paths.map(this.loadSchemasForPath).flat();
   }
 
-  public async getOpenApiSchemas(): Promise<OpenApiSchema[]> {
+  public async getOpenApiSchemas(): Promise<OpenApiSchemaSource[]> {
     const nonExistingPaths = this.absolutePaths.filter(this.notExists);
 
     if (nonExistingPaths.length) {

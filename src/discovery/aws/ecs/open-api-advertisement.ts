@@ -1,4 +1,4 @@
-export interface OpenApiAdvertisement {
+export interface EcsOpenApiAdvertisement {
   source: string;
   protocol: 'http' | 'https';
   host: string;

@@ -24,7 +24,7 @@ export class AppController {
 
     const schema = schemas.find(({ id }) => id === schemaSource);
 
-    if (!schema) {
+    if (!schema?.schema) {
       throw new NotFoundException('The requested schema does not exist');
     }
 
@@ -36,7 +36,7 @@ export class AppController {
     const schemas =
       await this.openApiDiscoveryService.getOpenApiSchemasWithProxy();
 
-    const urls = schemas.map(({ id, source, schema }) => ({
+    const urls = schemas.map(({ id, schema }) => ({
       name: schema?.info?.title ?? 'No Title',
       url: `/open-api/schemas/${id}`,
     }));
