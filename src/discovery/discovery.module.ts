@@ -1,27 +1,25 @@
-import { DynamicModule, Logger, Module } from '@nestjs/common';
 import { HttpModule, HttpService } from '@nestjs/axios';
-import { AwsEcsOpenApiDiscoveryService } from './aws/ecs/ecs-open-api-discovery-service';
-import { StaticOpenApiDiscoveryService } from './static/static-open-api-discovery-service';
+import { DynamicModule, Logger, Module } from '@nestjs/common';
 import {
   ClassProvider,
   ExistingProvider,
   FactoryProvider,
   ValueProvider,
 } from '@nestjs/common/interfaces/modules/provider.interface';
-
+import Ajv from 'ajv';
+import * as Fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 
-import { DiscoveryService } from './discovery.service';
+import * as ProviderJsonSchema from '../../providers.schema.json';
+import { ProxyModule } from '../proxy/proxy.module';
+import { AwsEcsOpenApiDiscoveryService } from './aws/ecs/ecs-open-api-discovery-service';
 import {
   AwsEcsDiscoveryProvider,
   DiscoveryProvider,
   StaticDiscoveryProvider,
 } from './discovery-provider';
-import Ajv from 'ajv';
-import { ProxyModule } from '../proxy/proxy.module';
-import * as Fs from 'fs';
-
-import * as ProviderJsonSchema from '../../providers.schema.json';
+import { DiscoveryService } from './discovery.service';
+import { StaticOpenApiDiscoveryService } from './static/static-open-api-discovery-service';
 
 export const DISCOVERY_SERVICES_TOKEN = 'OpenApiDiscoveryServices';
 export const DISCOVERY_CONFIG_OPTIONS = 'DISCOVERY_CONFIG_OPTIONS';

@@ -1,7 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import * as crypto from 'crypto';
 import { ConfigService } from '@nestjs/config';
+import * as crypto from 'crypto';
 import * as jwt from 'jsonwebtoken';
+
 import { fromBase64Url, toBase64Url } from '../discovery/encoding';
 
 @Injectable()

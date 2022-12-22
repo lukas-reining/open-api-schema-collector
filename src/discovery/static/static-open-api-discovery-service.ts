@@ -1,11 +1,12 @@
+import { Logger } from '@nestjs/common';
+import * as Fs from 'fs';
+import * as Path from 'path';
+
 import { OpenApiDiscoveryService } from '../common/open-api-discovery-service';
 import {
   OpenApiSchemaSource,
   toBaseUrl,
 } from '../common/open-api-schema-source';
-import * as Fs from 'fs';
-import * as Path from 'path';
-import { Logger } from '@nestjs/common';
 import { md5 } from '../encoding';
 
 export class StaticOpenApiDiscoveryService extends OpenApiDiscoveryService {

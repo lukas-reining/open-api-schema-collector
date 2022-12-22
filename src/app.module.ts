@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+
 import { AppController } from './app.controller';
 import { DiscoveryModule } from './discovery/discovery.module';
 import { ProxyModule } from './proxy/proxy.module';

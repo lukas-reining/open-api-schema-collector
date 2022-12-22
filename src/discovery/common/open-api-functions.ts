@@ -1,10 +1,11 @@
+import * as url from 'url';
+
 import {
   OpenApiDocV2,
   OpenApiDocV3,
   OpenApiDocV3_1,
   OpenApiSchemaSource,
 } from './open-api-schema-source';
-import * as url from 'url';
 
 export function toBaseUrlV2({
   address,

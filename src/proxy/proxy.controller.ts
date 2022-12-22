@@ -8,6 +8,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import * as proxy from 'express-http-proxy';
+
 import { ProxyService } from './proxy.service';
 
 @Controller('proxy')

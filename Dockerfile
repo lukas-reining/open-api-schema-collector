@@ -49,4 +49,4 @@ COPY --chown=node:node --from=build /usr/src/app/providers.schema.json ./provide
 COPY --chown=node:node --from=build /usr/src/app/openapi ./openapi
 COPY --chown=node:node --from=build /usr/src/app/example_providers.json ./example_providers.json
 
-CMD [ "node", "dist/main.js" ]
+CMD [ "node", "dist/src/main.js" ]

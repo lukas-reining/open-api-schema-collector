@@ -1,18 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common';
+
+import { ProxyService } from '../proxy/proxy.service';
 import { OpenApiDiscoveryService } from './common/open-api-discovery-service';
-import {
-  isOasV2Source,
-  isOasV3_1Source,
-  isOasV3Source,
-  OpenApiDoc,
-  OpenApiSchemaSource,
-} from './common/open-api-schema-source';
-import { DISCOVERY_SERVICES_TOKEN } from './discovery.module';
 import {
   toOpenApiSchemaWithProxyOAS2,
   toOpenApiSchemaWithProxyOAS3,
 } from './common/open-api-functions';
-import { ProxyService } from '../proxy/proxy.service';
+import {
+  OpenApiDoc,
+  OpenApiSchemaSource,
+  isOasV2Source,
+  isOasV3Source,
+  isOasV3_1Source,
+} from './common/open-api-schema-source';
+import { DISCOVERY_SERVICES_TOKEN } from './discovery.module';
 
 @Injectable()
 export class DiscoveryService extends OpenApiDiscoveryService {

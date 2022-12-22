@@ -1,14 +1,14 @@
 import { ECS, Tag, Task } from '@aws-sdk/client-ecs';
-import { OpenApiDiscoveryService } from '../../common/open-api-discovery-service';
+import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
-import { isDefined } from '../../../common';
+import { firstValueFrom } from 'rxjs';
 
+import { isDefined } from '../../../common';
+import { OpenApiDiscoveryService } from '../../common/open-api-discovery-service';
 import {
   OpenApiSchemaSource,
   toBaseUrl,
 } from '../../common/open-api-schema-source';
-import { firstValueFrom } from 'rxjs';
-import { HttpService } from '@nestjs/axios';
 import { md5 } from '../../encoding';
 import { EcsOpenApiAdvertisement } from './open-api-advertisement';
 
