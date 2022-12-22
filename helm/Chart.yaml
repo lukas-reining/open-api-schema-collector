@@ -1,0 +1,6 @@
+apiVersion: v2
+name: open-api-discovery
+description: Helm Chart for OpenApi Discovery
+type: application
+version: 0.1.0
+appVersion: 0.1.0

@@ -1,14 +1,9 @@
 [
   {
     "type": "static",
-    "paths": [
-      "openapi"
-    ]
+    "path": "openapi"
   },
   {
-    "type": "aws_ecs",
-    "clusterArns": [
-      "arn:aws:ecs:eu-central-1:938786464309:cluster/ecs-test-cluster"
-    ]
+    "type": "kubernetes"
   }
 ]

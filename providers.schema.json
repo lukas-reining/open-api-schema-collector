@@ -6,12 +6,9 @@
                 {
                     "additionalProperties": false,
                     "properties": {
-                        "paths": {
-                            "items": {
-                                "type": "string"
-                            },
-                            "title": "paths",
-                            "type": "array"
+                        "path": {
+                            "title": "path",
+                            "type": "string"
                         },
                         "type": {
                             "enum": [
@@ -22,7 +19,23 @@
                         }
                     },
                     "required": [
-                        "paths",
+                        "path",
+                        "type"
+                    ],
+                    "type": "object"
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "type": {
+                            "enum": [
+                                "kubernetes"
+                            ],
+                            "title": "type",
+                            "type": "string"
+                        }
+                    },
+                    "required": [
                         "type"
                     ],
                     "type": "object"

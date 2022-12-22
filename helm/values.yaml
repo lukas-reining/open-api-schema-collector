@@ -1,0 +1,56 @@
+replicaCount: 1
+
+image:
+  repository: open-api-schema-collector
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+nameOverride: ""
+fullnameOverride: ""
+imagePullSecrets: [ ]
+
+serviceAccount:
+  create: true
+  annotations: { }
+  name: ""
+
+podAnnotations: { }
+podSecurityContext: { }
+securityContext: { }
+
+openApiDiscovery:
+  port: 3000
+  staticOasSchemaPath: "../openapi/*.json"
+  providers: [
+    { type: "kubernetes" }
+  ]
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: { }
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: [ ]
+
+resources: { }
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: { }
+
+tolerations: [ ]
+
+affinity: { }

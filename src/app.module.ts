@@ -1,16 +1,25 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { AppController } from './app.controller';
+import { Config, parseConfig } from './config';
 import { DiscoveryModule } from './discovery/discovery.module';
 import { ProxyModule } from './proxy/proxy.module';
-
-const providerJsonPath = process.env.OASD_PROVIDERS_JSON_PATH;
 
 @Module({
   imports: [
     ProxyModule,
-    DiscoveryModule.register({
-      providersFile: providerJsonPath ?? './example_providers.json',
+    ConfigModule.forRoot({
+      load: [parseConfig],
+      isGlobal: true,
+      expandVariables: true,
+    }),
+    DiscoveryModule.registerAsync({
+      useFactory: (config: ConfigService<Config, true>) => ({
+        providersFile: config.get('discoveryJsonPath'),
+        allowInternalProxy: config.get('proxyInternal'),
+      }),
+      inject: [ConfigService],
     }),
   ],
   controllers: [AppController],

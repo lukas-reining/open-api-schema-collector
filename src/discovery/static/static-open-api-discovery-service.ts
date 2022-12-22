@@ -11,19 +11,15 @@ import { md5 } from '../encoding';
 
 export class StaticOpenApiDiscoveryService extends OpenApiDiscoveryService {
   private readonly logger = new Logger(StaticOpenApiDiscoveryService.name);
-  private readonly absolutePaths: string[];
+  private readonly absolutePath: string;
 
-  constructor(paths: string[]) {
+  constructor(path: string) {
     super();
-    this.absolutePaths = this.toAbsolute(paths);
+    this.absolutePath = this.toAbsolute(path);
   }
 
-  private toAbsolute(paths: string[]): string[] {
-    return paths.map((current) => Path.resolve(current));
-  }
-
-  private exists(path: string) {
-    return Fs.existsSync(path);
+  private toAbsolute(path: string): string {
+    return Path.resolve(path);
   }
 
   private notExists(path: string) {
@@ -56,16 +52,14 @@ export class StaticOpenApiDiscoveryService extends OpenApiDiscoveryService {
   }
 
   public async getOpenApiSchemas(): Promise<OpenApiSchemaSource[]> {
-    const nonExistingPaths = this.absolutePaths.filter(this.notExists);
-
-    if (nonExistingPaths.length) {
+    if (this.notExists(this.absolutePath)) {
       this.logger.warn(
-        `The following paths do not exist and will not be discovered: \n${nonExistingPaths.join(
-          '\n',
-        )}`,
+        `The following path does not exist and will not be discovered: \n${this.absolutePath}`,
       );
+
+      return [];
     }
 
-    return this.loadSchemasForPaths(this.absolutePaths.filter(this.exists));
+    return this.loadSchemasForPaths([this.absolutePath]);
   }
 }
