@@ -21,7 +21,9 @@ securityContext: { }
 openApiDiscovery:
   port: 3000
   extraVolumeMounts:
+    - name: "Test"
   extraVolumes:
+    - name: "Test"
   resources:
   providers: [
     { type: "kubernetes" }

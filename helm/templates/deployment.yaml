@@ -51,16 +51,15 @@ spec:
             - name: OASD_DISCOVERY_JSON_PATH
               value: /config/providers.json
           resources:
-          {{- if .Values.openApiDiscovery.extraVolumeMounts }}
+          {{- if .Values.openApiDiscovery.resources }}
           {{- toYaml .Values.openApiDiscovery.resources | nindent 12 }}
           {{- end }}
           volumeMounts:
             {{- if .Values.openApiDiscovery.extraVolumeMounts }}
-{{ toYaml .Values.openApiDiscovery.extraVolumeMounts | indent 12 }}
+            {{- toYaml .Values.openApiDiscovery.extraVolumeMounts | nindent 12 }}
             {{- end }}
             - name: providers
               mountPath: /config
-
       {{- with .Values.nodeSelector }}
       nodeSelector:
       {{- toYaml . | nindent 8 }}
@@ -75,7 +74,7 @@ spec:
       {{- end }}
       volumes:
         {{- if .Values.openApiDiscovery.extraVolumes }}
-{{ toYaml .Values.openApiDiscovery.extraVolumes | indent 8 }}
+        {{- toYaml .Values.openApiDiscovery.extraVolumes | nindent 8 }}
         {{- end }}
         - name: providers
           configMap:
