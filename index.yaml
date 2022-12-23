@@ -3,7 +3,17 @@ entries:
   open-api-discovery:
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2022-12-23T13:12:31.478419+01:00"
+    created: "2022-12-23T13:55:27.278067+01:00"
+    description: Helm Chart for OpenApi Discovery
+    digest: ac900820a4054d93daa87186d040a0aefea6dc1c8b7e1f2434b9ffd4ebc4ac24
+    name: open-api-discovery
+    type: application
+    urls:
+    - charts/open-api-discovery-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2022-12-23T13:55:27.277792+01:00"
     description: Helm Chart for OpenApi Discovery
     digest: 413746175bff81e546979c0d5002a79c16bf57090540900fe6d0c16e6604c0ca
     name: open-api-discovery
@@ -11,4 +21,4 @@ entries:
     urls:
     - charts/open-api-discovery-0.1.0.tgz
     version: 0.1.0
-generated: "2022-12-23T13:12:31.477777+01:00"
+generated: "2022-12-23T13:55:27.276423+01:00"

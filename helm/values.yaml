@@ -21,9 +21,7 @@ securityContext: { }
 openApiDiscovery:
   port: 3000
   extraVolumeMounts:
-    - mountPath: /var/nothing
-      name: nothing
-      readOnly: true
+  extraVolumes:
   resources:
   providers: [
     { type: "kubernetes" }
